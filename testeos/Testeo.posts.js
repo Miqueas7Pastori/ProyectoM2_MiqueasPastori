@@ -35,4 +35,26 @@ describe("posts", () => {
     assert.ok(Array.isArray(body));
     assert.ok(body.some((post) => post.title === "El primer programa"));
   });
+
+  it("devuelve el detalle de una publicación", async () => {
+    const { status, body } = await request("/posts/1");
+
+    assert.equal(status, 200);
+    assert.equal(body.title, "El primer programa");
+    assert.equal(body.author_id, 1);
+  });
+
+  it("responde 404 si la publicación no existe", async () => {
+    const { status, body } = await request("/posts/999999");
+
+    assert.equal(status, 404);
+    assert.equal(body.error, "Publicación no encontrada");
+  });
+
+  it("responde 400 si el id no es un número", async () => {
+    const { status, body } = await request("/posts/abc");
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El id debe ser un número");
+  });
 });
