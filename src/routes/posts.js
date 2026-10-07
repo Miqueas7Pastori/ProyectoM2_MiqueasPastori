@@ -11,6 +11,41 @@ router.get("/", async (req, res) => {
   res.json(rows);
 });
 
+router.get("/author/:authorId", async (req, res) => {
+  try {
+    const authorResult = await pool.query(
+      "SELECT id, name, email, bio, created_at FROM authors WHERE id = $1",
+      [req.params.authorId]
+    );
+    const author = authorResult.rows[0];
+
+    if (!author) {
+      return res.status(404).json({ error: "Autor no encontrado" });
+    }
+
+    const postsResult = await pool.query(
+      `SELECT id, title, content, published, created_at
+       FROM posts
+       WHERE author_id = $1
+       ORDER BY id`,
+      [req.params.authorId]
+    );
+
+    res.json(
+      postsResult.rows.map((post) => ({
+        ...post,
+        author,
+      }))
+    );
+  } catch (error) {
+    if (error.code === "22P02") {
+      return res.status(400).json({ error: "El id debe ser un número" });
+    }
+
+    throw error;
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const { rows } = await pool.query(
