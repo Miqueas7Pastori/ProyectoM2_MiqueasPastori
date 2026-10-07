@@ -81,4 +81,75 @@ describe("posts", () => {
     assert.equal(status, 400);
     assert.equal(body.error, "El id debe ser un número");
   });
+
+  it("responde 400 si falta el título al crear", async () => {
+    const { status, body } = await request("/posts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ content: "Un texto", author_id: 1 }),
+    });
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El título es obligatorio");
+  });
+
+  it("responde 400 si falta el contenido al crear", async () => {
+    const { status, body } = await request("/posts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title: "Un título", author_id: 1 }),
+    });
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El contenido es obligatorio");
+  });
+
+  it("responde 400 si falta el autor al crear", async () => {
+    const { status, body } = await request("/posts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title: "Un título", content: "Un texto" }),
+    });
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El autor es obligatorio");
+  });
+
+  it("responde 400 si el autor de la publicación no existe", async () => {
+    const { status, body } = await request("/posts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: "Un título",
+        content: "Un texto",
+        author_id: 999999,
+      }),
+    });
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El autor no existe");
+  });
+
+  it("crea una publicación y la borra", async () => {
+    const created = await request("/posts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: "Publicación de prueba",
+        content: "Texto de prueba",
+        author_id: 1,
+      }),
+    });
+
+    assert.equal(created.status, 201);
+    assert.equal(created.body.title, "Publicación de prueba");
+    assert.equal(created.body.author_id, 1);
+    assert.equal(created.body.published, false);
+
+    const deleted = await request(`/posts/${created.body.id}`, {
+      method: "DELETE",
+    });
+
+    assert.equal(deleted.status, 204);
+  });
 });
