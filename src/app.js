@@ -1,5 +1,6 @@
 import express from "express";
 import authorsRouter from "./routes/authors.js";
+import postsRouter from "./routes/posts.js";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/authors", authorsRouter);
+app.use("/posts", postsRouter);
 
 app.use((error, req, res, next) => {
   console.error(error);
