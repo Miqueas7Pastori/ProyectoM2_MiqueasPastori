@@ -67,4 +67,44 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  const title = req.body.title?.trim();
+  const content = req.body.content?.trim();
+  const authorId = req.body.author_id;
+  const published = req.body.published ?? false;
+
+  if (!title) {
+    return res.status(400).json({ error: "El título es obligatorio" });
+  }
+
+  if (!content) {
+    return res.status(400).json({ error: "El contenido es obligatorio" });
+  }
+
+  if (authorId === undefined || authorId === null || authorId === "") {
+    return res.status(400).json({ error: "El autor es obligatorio" });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO posts (author_id, title, content, published)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, author_id, title, content, published, created_at`,
+      [authorId, title, content, published]
+    );
+
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    if (error.code === "23503") {
+      return res.status(400).json({ error: "El autor no existe" });
+    }
+
+    if (error.code === "22P02") {
+      return res.status(400).json({ error: "El author_id debe ser un número" });
+    }
+
+    throw error;
+  }
+});
+
 export default router;
