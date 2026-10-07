@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "API REST de MiniBlog (DevSpark) para gestionar usuarios y publicaciones.",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
