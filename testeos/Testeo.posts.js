@@ -57,4 +57,28 @@ describe("posts", () => {
     assert.equal(status, 400);
     assert.equal(body.error, "El id debe ser un número");
   });
+
+  it("lista las publicaciones de un autor", async () => {
+    const { status, body } = await request("/posts/author/1");
+
+    assert.equal(status, 200);
+    assert.ok(Array.isArray(body));
+    assert.ok(body.some((post) => post.title === "El primer programa"));
+    assert.equal(body[0].author.name, "Ada Lovelace");
+    assert.equal(body[0].author.email, "ada@miniblog.dev");
+  });
+
+  it("responde 404 si el autor de las publicaciones no existe", async () => {
+    const { status, body } = await request("/posts/author/999999");
+
+    assert.equal(status, 404);
+    assert.equal(body.error, "Autor no encontrado");
+  });
+
+  it("responde 400 si el id del autor no es un número", async () => {
+    const { status, body } = await request("/posts/author/abc");
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El id debe ser un número");
+  });
 });
