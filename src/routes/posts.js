@@ -156,4 +156,24 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const { rowCount } = await pool.query("DELETE FROM posts WHERE id = $1", [
+      req.params.id,
+    ]);
+
+    if (!rowCount) {
+      return res.status(404).json({ error: "Publicación no encontrada" });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    if (error.code === "22P02") {
+      return res.status(400).json({ error: "El id debe ser un número" });
+    }
+
+    throw error;
+  }
+});
+
 export default router;
