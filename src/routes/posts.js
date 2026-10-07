@@ -107,4 +107,53 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  const title = req.body.title?.trim();
+  const content = req.body.content?.trim();
+  const authorId = req.body.author_id;
+  const published = req.body.published ?? false;
+
+  if (!title) {
+    return res.status(400).json({ error: "El título es obligatorio" });
+  }
+
+  if (!content) {
+    return res.status(400).json({ error: "El contenido es obligatorio" });
+  }
+
+  if (authorId === undefined || authorId === null || authorId === "") {
+    return res.status(400).json({ error: "El autor es obligatorio" });
+  }
+
+  if (!Number.isInteger(Number(authorId))) {
+    return res.status(400).json({ error: "El author_id debe ser un número" });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `UPDATE posts
+       SET author_id = $1, title = $2, content = $3, published = $4
+       WHERE id = $5
+       RETURNING id, author_id, title, content, published, created_at`,
+      [authorId, title, content, published, req.params.id]
+    );
+
+    if (!rows[0]) {
+      return res.status(404).json({ error: "Publicación no encontrada" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    if (error.code === "23503") {
+      return res.status(400).json({ error: "El autor no existe" });
+    }
+
+    if (error.code === "22P02") {
+      return res.status(400).json({ error: "El id debe ser un número" });
+    }
+
+    throw error;
+  }
+});
+
 export default router;
