@@ -152,4 +152,63 @@ describe("posts", () => {
 
     assert.equal(deleted.status, 204);
   });
+
+  it("responde 400 si falta el título al actualizar", async () => {
+    const { status, body } = await request("/posts/1", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        content: "Notas sobre la máquina analítica.",
+        author_id: 1,
+      }),
+    });
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El título es obligatorio");
+  });
+
+  it("responde 404 si la publicación a actualizar no existe", async () => {
+    const { status, body } = await request("/posts/999999", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: "Un título",
+        content: "Un texto",
+        author_id: 1,
+      }),
+    });
+
+    assert.equal(status, 404);
+    assert.equal(body.error, "Publicación no encontrada");
+  });
+
+  it("actualiza una publicación y restaura el original", async () => {
+    const updated = await request("/posts/1", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: "Título actualizado",
+        content: "Contenido actualizado",
+        author_id: 1,
+        published: true,
+      }),
+    });
+
+    assert.equal(updated.status, 200);
+    assert.equal(updated.body.title, "Título actualizado");
+
+    const restored = await request("/posts/1", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: "El primer programa",
+        content: "Notas sobre la máquina analítica.",
+        author_id: 1,
+        published: true,
+      }),
+    });
+
+    assert.equal(restored.status, 200);
+    assert.equal(restored.body.title, "El primer programa");
+  });
 });
