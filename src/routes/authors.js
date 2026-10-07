@@ -32,4 +32,35 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  const name = req.body.name?.trim();
+  const email = req.body.email?.trim();
+  const bio = req.body.bio ?? null;
+
+  if (!name) {
+    return res.status(400).json({ error: "El nombre es obligatorio" });
+  }
+
+  if (!email) {
+    return res.status(400).json({ error: "El email es obligatorio" });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO authors (name, email, bio)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, email, bio, created_at`,
+      [name, email, bio]
+    );
+
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(400).json({ error: "El email ya está registrado" });
+    }
+
+    throw error;
+  }
+});
+
 export default router;
