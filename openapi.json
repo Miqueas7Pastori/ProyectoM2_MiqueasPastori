@@ -1,0 +1,237 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MiniBlog",
+    "description": "API de autores y publicaciones de DevSpark. Un error inesperado responde 500 con un mensaje.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor local"
+    }
+  ],
+  "tags": [
+    { "name": "authors", "description": "Autores del blog" }
+  ],
+  "paths": {
+    "/authors": {
+      "get": {
+        "tags": ["authors"],
+        "summary": "Listar autores",
+        "responses": {
+          "200": {
+            "description": "Lista de autores",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Author" }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["authors"],
+        "summary": "Crear un autor",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthorInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Autor creado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Author" }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta el nombre, falta el email o el email ya está registrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "nombre": { "value": { "error": "El nombre es obligatorio" } },
+                  "email": { "value": { "error": "El email es obligatorio" } },
+                  "duplicado": { "value": { "error": "El email ya está registrado" } }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/authors/{id}": {
+      "get": {
+        "tags": ["authors"],
+        "summary": "Detalle de un autor",
+        "parameters": [{ "$ref": "#/components/parameters/AuthorId" }],
+        "responses": {
+          "200": {
+            "description": "Autor encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Author" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/InvalidId" },
+          "404": {
+            "description": "El autor no existe",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Autor no encontrado" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "put": {
+        "tags": ["authors"],
+        "summary": "Actualizar un autor",
+        "parameters": [{ "$ref": "#/components/parameters/AuthorId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthorInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autor actualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Author" }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos, id no numérico o email ya registrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "El autor no existe",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Autor no encontrado" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["authors"],
+        "summary": "Borrar un autor",
+        "parameters": [{ "$ref": "#/components/parameters/AuthorId" }],
+        "responses": {
+          "204": { "description": "Autor borrado" },
+          "400": {
+            "description": "El id no es un número o el autor tiene publicaciones",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "id": { "value": { "error": "El id debe ser un número" } },
+                  "posts": {
+                    "value": {
+                      "error": "No se puede borrar un autor que tiene publicaciones"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "El autor no existe",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Autor no encontrado" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "AuthorId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" }
+      }
+    },
+    "responses": {
+      "InvalidId": {
+        "description": "El id no es un número",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "El id debe ser un número" }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Error interno del servidor",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "Error interno del servidor" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        },
+        "required": ["error"]
+      },
+      "Author": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "bio": { "type": "string", "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "name", "email", "created_at"]
+      },
+      "AuthorInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "bio": { "type": "string", "nullable": true }
+        },
+        "required": ["name", "email"]
+      }
+    }
+  }
+}

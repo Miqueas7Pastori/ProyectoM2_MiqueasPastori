@@ -1,6 +1,15 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import authorsRouter from "./routes/authors.js";
 import postsRouter from "./routes/posts.js";
+
+const openapiPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../openapi.json"
+);
+const openapi = JSON.parse(readFileSync(openapiPath, "utf8"));
 
 const app = express();
 
@@ -12,6 +21,10 @@ app.get("/", (req, res) => {
     description: "API de usuarios y publicaciones de DevSpark",
     status: "ok",
   });
+});
+
+app.get("/openapi.json", (req, res) => {
+  res.json(openapi);
 });
 
 app.use("/authors", authorsRouter);
