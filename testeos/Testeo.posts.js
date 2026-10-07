@@ -33,14 +33,14 @@ describe("posts", () => {
 
     assert.equal(status, 200);
     assert.ok(Array.isArray(body));
-    assert.ok(body.some((post) => post.title === "El primer programa"));
+    assert.ok(body.some((post) => post.title === "Introducción a Node.js"));
   });
 
   it("devuelve el detalle de una publicación", async () => {
     const { status, body } = await request("/posts/1");
 
     assert.equal(status, 200);
-    assert.equal(body.title, "El primer programa");
+    assert.equal(body.title, "Introducción a Node.js");
     assert.equal(body.author_id, 1);
   });
 
@@ -63,9 +63,9 @@ describe("posts", () => {
 
     assert.equal(status, 200);
     assert.ok(Array.isArray(body));
-    assert.ok(body.some((post) => post.title === "El primer programa"));
-    assert.equal(body[0].author.name, "Ada Lovelace");
-    assert.equal(body[0].author.email, "ada@miniblog.dev");
+    assert.ok(body.some((post) => post.title === "Introducción a Node.js"));
+    assert.equal(body[0].author.name, "Ana García");
+    assert.equal(body[0].author.email, "ana@example.com");
   });
 
   it("responde 404 si el autor de las publicaciones no existe", async () => {
@@ -158,7 +158,7 @@ describe("posts", () => {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        content: "Notas sobre la máquina analítica.",
+        content: "Node.js es un runtime de JavaScript...",
         author_id: 1,
       }),
     });
@@ -201,15 +201,15 @@ describe("posts", () => {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        title: "El primer programa",
-        content: "Notas sobre la máquina analítica.",
+        title: "Introducción a Node.js",
+        content: "Node.js es un runtime de JavaScript...",
         author_id: 1,
         published: true,
       }),
     });
 
     assert.equal(restored.status, 200);
-    assert.equal(restored.body.title, "El primer programa");
+    assert.equal(restored.body.title, "Introducción a Node.js");
   });
 
   it("responde 404 si la publicación a borrar no existe", async () => {

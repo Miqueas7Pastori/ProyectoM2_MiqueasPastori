@@ -33,15 +33,15 @@ describe("authors", () => {
 
     assert.equal(status, 200);
     assert.ok(Array.isArray(body));
-    assert.ok(body.some((author) => author.email === "ada@miniblog.dev"));
+    assert.ok(body.some((author) => author.email === "ana@example.com"));
   });
 
   it("devuelve el detalle de un autor", async () => {
     const { status, body } = await request("/authors/1");
 
     assert.equal(status, 200);
-    assert.equal(body.name, "Ada Lovelace");
-    assert.equal(body.email, "ada@miniblog.dev");
+    assert.equal(body.name, "Ana García");
+    assert.equal(body.email, "ana@example.com");
   });
 
   it("responde 404 si el autor no existe", async () => {
@@ -67,8 +67,8 @@ describe("authors", () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        name: "Otra Ada",
-        email: "ada@miniblog.dev",
+        name: "Otra Ana",
+        email: "ana@example.com",
       }),
     });
 
@@ -105,6 +105,6 @@ describe("authors", () => {
 
     const author = await request("/authors/1");
     assert.equal(author.status, 200);
-    assert.equal(author.body.email, "ada@miniblog.dev");
+    assert.equal(author.body.email, "ana@example.com");
   });
 });
