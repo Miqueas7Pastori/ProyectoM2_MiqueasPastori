@@ -211,4 +211,44 @@ describe("posts", () => {
     assert.equal(restored.status, 200);
     assert.equal(restored.body.title, "El primer programa");
   });
+
+  it("responde 404 si la publicación a borrar no existe", async () => {
+    const { status, body } = await request("/posts/999999", {
+      method: "DELETE",
+    });
+
+    assert.equal(status, 404);
+    assert.equal(body.error, "Publicación no encontrada");
+  });
+
+  it("responde 400 si el id a borrar no es un número", async () => {
+    const { status, body } = await request("/posts/abc", {
+      method: "DELETE",
+    });
+
+    assert.equal(status, 400);
+    assert.equal(body.error, "El id debe ser un número");
+  });
+
+  it("borra una publicación", async () => {
+    const created = await request("/posts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: "Publicación para borrar",
+        content: "Se elimina en el test",
+        author_id: 1,
+      }),
+    });
+
+    const deleted = await request(`/posts/${created.body.id}`, {
+      method: "DELETE",
+    });
+
+    assert.equal(deleted.status, 204);
+    assert.equal(deleted.body, null);
+
+    const missing = await request(`/posts/${created.body.id}`);
+    assert.equal(missing.status, 404);
+  });
 });
