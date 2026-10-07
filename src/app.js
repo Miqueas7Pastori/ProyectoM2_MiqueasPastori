@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import authorsRouter from "./routes/authors.js";
 import postsRouter from "./routes/posts.js";
 
@@ -26,6 +27,8 @@ app.get("/", (req, res) => {
 app.get("/openapi.json", (req, res) => {
   res.json(openapi);
 });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapi));
 
 app.use("/authors", authorsRouter);
 app.use("/posts", postsRouter);

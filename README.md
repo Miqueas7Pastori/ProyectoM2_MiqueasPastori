@@ -10,8 +10,8 @@ Cada publicación pertenece a un solo autor. Un autor puede tener varias.
 |---|---|
 | Código en GitHub | https://github.com/Miqueas7Pastori/ProyectoM2_MiqueasPastori |
 | Contrato de la API | [openapi.json](openapi.json) |
-| API publicada | Se completa cuando agreguemos Swagger |
-| Página de Swagger | Se completa cuando agreguemos Swagger |
+| API publicada | La dirección de Railway, cuando la pases |
+| Página de Swagger | En local: http://localhost:3000/api-docs |
 
 ## Carpetas
 
@@ -137,11 +137,14 @@ Para que pasen, PostgreSQL tiene que estar prendido, el `.env` tiene que existir
 
 ## OpenAPI
 
-`openapi.json` describe cada ruta, los datos que recibe y los códigos que puede devolver. Con el servidor encendido se lee en:
+`openapi.json` describe cada ruta, los datos que recibe y los códigos que puede devolver.
 
-http://localhost:3000/openapi.json
+Con el servidor encendido hay dos formas de verlo:
 
-Hoy el navegador muestra ese JSON. La página visual de Swagger se suma en el próximo cambio.
+- El JSON pelado: http://localhost:3000/openapi.json
+- La página para leerlo y probarlo: http://localhost:3000/api-docs
+
+En Railway es la misma página, agregando `/api-docs` al final de la dirección pública.
 
 ## Publicar en Railway
 
