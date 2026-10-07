@@ -12,7 +12,8 @@
     }
   ],
   "tags": [
-    { "name": "authors", "description": "Autores del blog" }
+    { "name": "authors", "description": "Autores del blog" },
+    { "name": "posts", "description": "Publicaciones" }
   ],
   "paths": {
     "/authors": {
@@ -173,6 +174,165 @@
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
+    },
+    "/posts": {
+      "get": {
+        "tags": ["posts"],
+        "summary": "Listar publicaciones",
+        "responses": {
+          "200": {
+            "description": "Lista de publicaciones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["posts"],
+        "summary": "Crear una publicación",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PostInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Publicación creada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": {
+            "description": "Faltan datos, el author_id no es un número o el autor no existe",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "titulo": { "value": { "error": "El título es obligatorio" } },
+                  "contenido": { "value": { "error": "El contenido es obligatorio" } },
+                  "autor": { "value": { "error": "El autor es obligatorio" } },
+                  "autorInexistente": { "value": { "error": "El autor no existe" } }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/posts/author/{authorId}": {
+      "get": {
+        "tags": ["posts"],
+        "summary": "Publicaciones de un autor, con sus datos",
+        "parameters": [
+          {
+            "name": "authorId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publicaciones del autor. Si no tiene, la lista va vacía.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PostWithAuthor" }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/InvalidId" },
+          "404": {
+            "description": "El autor no existe",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Autor no encontrado" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "get": {
+        "tags": ["posts"],
+        "summary": "Detalle de una publicación",
+        "parameters": [{ "$ref": "#/components/parameters/PostId" }],
+        "responses": {
+          "200": {
+            "description": "Publicación encontrada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/InvalidId" },
+          "404": { "$ref": "#/components/responses/PostNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "put": {
+        "tags": ["posts"],
+        "summary": "Actualizar una publicación",
+        "parameters": [{ "$ref": "#/components/parameters/PostId" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PostInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Publicación actualizada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos, id no numérico o autor inexistente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/PostNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["posts"],
+        "summary": "Borrar una publicación",
+        "parameters": [{ "$ref": "#/components/parameters/PostId" }],
+        "responses": {
+          "204": { "description": "Publicación borrada" },
+          "400": { "$ref": "#/components/responses/InvalidId" },
+          "404": { "$ref": "#/components/responses/PostNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
     }
   },
   "components": {
@@ -182,9 +342,24 @@
         "in": "path",
         "required": true,
         "schema": { "type": "integer" }
+      },
+      "PostId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "integer" }
       }
     },
     "responses": {
+      "PostNotFound": {
+        "description": "La publicación no existe",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "Publicación no encontrada" }
+          }
+        }
+      },
       "InvalidId": {
         "description": "El id no es un número",
         "content": {
@@ -231,6 +406,40 @@
           "bio": { "type": "string", "nullable": true }
         },
         "required": ["name", "email"]
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "author_id": { "type": "integer" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "author_id", "title", "content", "published", "created_at"]
+      },
+      "PostInput": {
+        "type": "object",
+        "properties": {
+          "author_id": { "type": "integer" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published": { "type": "boolean", "default": false }
+        },
+        "required": ["author_id", "title", "content"]
+      },
+      "PostWithAuthor": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "published": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "author": { "$ref": "#/components/schemas/Author" }
+        },
+        "required": ["id", "title", "content", "published", "created_at", "author"]
       }
     }
   }
