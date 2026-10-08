@@ -10,23 +10,30 @@ Cada publicación pertenece a un solo autor. Un autor puede tener varias.
 |---|---|
 | Código en GitHub | https://github.com/Miqueas7Pastori/ProyectoM2_MiqueasPastori |
 | Contrato de la API | [openapi.json](openapi.json) |
-| API publicada | La dirección de Railway, cuando la pases |
-| Página de Swagger | En local: http://localhost:3000/api-docs |
+| API publicada | https://proyectom2miqueaspastori-miniblog.up.railway.app/ |
+| Página de Swagger | https://proyectom2miqueaspastori-miniblog.up.railway.app/api-docs/ |
 
 ## Carpetas
 
 ```
-openapi.json          contrato de las rutas, en JSON
-package.json          dependencias y comandos
-.env.example          variables de ejemplo, sin la contraseña real
-sql/Tablas.sql        crea authors y posts
-sql/seed.sql          carga los datos de ejemplo
-src/app.js            define Express, las rutas y los errores
-src/server.js         abre el puerto
-src/db.js             se conecta a PostgreSQL
-src/seed.js           corre el archivo sql/seed.sql
-src/routes/           endpoints de autores y de publicaciones
-testeos/              pruebas de authors y de posts
+.
+├── .env.example              variables de ejemplo, sin la contraseña real
+├── openapi.json              contrato de las rutas, en JSON
+├── package.json              dependencias y comandos
+├── sql/
+│   ├── Tablas.sql            crea authors y posts
+│   └── seed.sql              carga los datos de ejemplo
+├── src/
+│   ├── app.js                define Express, las rutas y los errores
+│   ├── db.js                 se conecta a PostgreSQL
+│   ├── seed.js               corre el archivo sql/seed.sql
+│   ├── server.js             abre el puerto
+│   └── routes/
+│       ├── authors.js        endpoints de autores
+│       └── posts.js          endpoints de publicaciones
+└── testeos/
+    ├── Testeo.autores.js     pruebas de autores
+    └── Testeo.posts.js       pruebas de publicaciones
 ```
 
 Un pedido entra por la ruta, la ruta le pregunta a PostgreSQL y la respuesta vuelve en JSON.
@@ -144,7 +151,7 @@ Con el servidor encendido hay dos formas de verlo:
 - El JSON pelado: http://localhost:3000/openapi.json
 - La página para leerlo y probarlo: http://localhost:3000/api-docs
 
-En Railway es la misma página, agregando `/api-docs` al final de la dirección pública.
+En Railway esa página está en https://proyectom2miqueaspastori-miniblog.up.railway.app/api-docs/
 
 ## Publicar en Railway
 
