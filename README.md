@@ -4,7 +4,7 @@ MiniBlog es la API de DevSpark para guardar autores y publicaciones. Está hecha
 
 Cada publicación pertenece a un solo autor. Un autor puede tener varias.
 
-## Dónde está cada cosa
+## Enlaces
 
 | Qué | Dónde |
 |---|---|
@@ -13,7 +13,7 @@ Cada publicación pertenece a un solo autor. Un autor puede tener varias.
 | API publicada | https://proyectom2miqueaspastori-miniblog.up.railway.app/ |
 | Página de Swagger | https://proyectom2miqueaspastori-miniblog.up.railway.app/api-docs/ |
 
-## Carpetas
+## Estructura del Proyecto
 
 ```
 .
@@ -63,7 +63,7 @@ Si un autor todavía tiene publicaciones, la API no lo borra. Hay que borrar pri
 
 Los datos de ejemplo son Ana García, Carlos Ruiz, María López y cinco publicaciones. Están en `sql/seed.sql`.
 
-## Correrla en la computadora
+## Como ejecutar el proyecto de manera local?
 
 Hace falta Node.js 20 o superior, y PostgreSQL instalado y encendido.
 
@@ -109,7 +109,7 @@ Abrí http://localhost:3000. La respuesta tiene que incluir `"service": "MiniBlo
 
 `npm run dev` reinicia el servidor cuando guardás un archivo. `npm start` lo deja fijo, que es lo que usa Railway. Para apagarlo, `Ctrl+C` en esa terminal.
 
-## Rutas
+## Rutas / Endpoints
 
 Si hay un error, el JSON trae un campo `error` con una frase corta.
 
